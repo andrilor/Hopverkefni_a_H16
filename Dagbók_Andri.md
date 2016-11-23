@@ -8,4 +8,3 @@ en það sem ég gerði í dag er að læra á Github til að geta notað það 
 -Andri
 ----------------------------
 24.11.2016
-k
