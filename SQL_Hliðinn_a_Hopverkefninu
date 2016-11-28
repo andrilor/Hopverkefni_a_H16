@@ -6,7 +6,7 @@ create table `User`
 (
 	`ID` INT NOT NULL AUTO_INCREMENT,
     `FullName` VARCHAR(150) NOT NULL,
-	`UserName` VARCHAR(45) NOT NULL,
+	`UserName` CHAR(45) NOT NULL,
 	`Email` VARCHAR(45) NOT NULL,
 	`Phone` INT NULL,
 	`Credentials` int NOT NULL,
@@ -49,12 +49,7 @@ create table `ItemPlacement`
 );
 
 insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Credentials`,`PassWord`)values('Administrator' ,'admin','Admin@Scale2.com',5812345,1,'pass.123');
-insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Credentials`,`PassWord`)values('Administrator' ,'admin2','Admin@Scale2.com',5812345,1,'pass.231');
-
-Select Credentials from User where Username='admin' and PassWord='pass';
-
-
-
+insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Credentials`,`PassWord`)values('Administrator' ,'admin2','Admin@Scale9.com',5812345,1,'pass.231');
 
 insert into ShelfSystem (`Section`, `Tower`, `Level`, `Row`) values('A', 01, 01, 01);
 insert into ShelfSystem (`Section`, `Tower`, `Level`, `Row`) values('A', 01, 01, 02);
@@ -1857,6 +1852,78 @@ insert into ShelfSystem (`Section`, `Tower`, `Level`, `Row`) values('F', 20, 05,
 insert into ShelfSystem (`Section`, `Tower`, `Level`, `Row`) values('F', 20, 05, 02);
 insert into ShelfSystem (`Section`, `Tower`, `Level`, `Row`) values('F', 20, 05, 03);
 
+create table ItemHistory
+(
+    ItemHistoryID int not null auto_increment,
+    TextInfo Varchar(100),
+    timeOfRegistered time not null,
+    DateOfRegistered date not null,
+	`ItemNumber` char(50) NOT NULL,
+	`Name` CHAR(80) NOT NULL,
+    `Description` CHAR(255) NULL,
+	`SerialNumber` CHAR(11) NOT NULL,
+	`By` CHAR(80) NOT NULL,
+    `Owner` CHAR(80) NOT NULL,
+    `amount` int NOT NULL,
+    constraint ItemHistory_PK primary key(ItemHistoryID)
+);
+
+create table ItemPlacementHistory
+(
+    ItemPlacementHistoryID int not null auto_increment,
+    TextInfo Varchar(100),
+    timeOfRegistered time not null,
+    DateOfRegistered date not null,
+    `Amount` INT NOT NULL,
+	`ShelfSystem_ID` INT NOT NULL,
+	`Items_ID` int(50) NOT NULL,
+    constraint ItemPlacementHistory_PK primary key(ItemPlacementHistoryID)
+);
+
+delimiter $$
+drop trigger if exists InsertHistoryInsert $$
+
+create trigger InsertHistoryInsert
+before insert on Items
+for each row
+begin
+     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('New item is now registered', timestamp(current_time()), timestamp(current_date()), new.ItemNumber, new.`Name`, new.`Description`, new.`SerialNumber`, new.`By`, new.`Owner`, new.`amount`);
+end $$
+delimiter ;
+
+delimiter $$
+drop trigger if exists InsertHistoryInsert $$
+
+create trigger InsertHistoryInsert
+before update on Items
+for each row
+begin
+     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Item information has been changed', timestamp(current_time()), timestamp(current_date()), new.ItemNumber, new.`Name`, new.`Description`, new.`SerialNumber`, new.`By`, new.`Owner`, new.`amount`);
+end $$
+delimiter ;
+
+delimiter $$
+drop trigger if exists ItemPlacementHistoryInsert $$
+
+create trigger ItemPlacementHistoryInsert
+before insert on ItemPlacement
+for each row
+begin
+     insert into ItemPlacementHistory (TextInfo, timeOfRegistered, DateOfRegistered, `Amount` ,`ShelfSystem_ID`,`Items_ID`) values('Item placed in shelf', timestamp(current_time()), timestamp(current_date()), new.`Amount`, new.`ShelfSystem_ID`, new.`Items_ID`);
+end $$
+delimiter ;
+
+delimiter $$
+drop trigger if exists ItemPlacementHistoryInsert $$
+
+create trigger ItemPlacementHistoryInsert
+before insert on ItemPlacement
+for each row
+begin
+     insert into ItemPlacementHistory (TextInfo, timeOfRegistered, DateOfRegistered, `Amount` ,`ShelfSystem_ID`,`Items_ID`) values('Item has been moved to a different shelf', timestamp(current_time()), timestamp(current_date()), new.`Amount`, new.`ShelfSystem_ID`, new.`Items_ID`);
+end $$
+delimiter ;
+
 insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil Super 3000 XE 5W-30 1L', '3020 151456', 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.', '00000000001', 'Mobil','N1',25);
 insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil 1 ESP Formula 5W-30 1L', '3020 437891', 'Leiðandi Smurolía sem er alveg fullkomin fyrir díselbíla. Þróuð með það í huga að bæta getu bensínbíla. Mobil 1 ESP Formula 5W-30 uppfyllir nýjustu flokkanir bílaiðnaðarins ACEA C2/C3 fyrir mótorolíur. ', '00000000002', 'Mobil','N1',15);
 insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil Super 3000 XE 5W-30 1L', '3020 151456', 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.', '00000000001', 'Mobil','Olís',25);
@@ -1876,7 +1943,6 @@ https://n1.is/vorur/billinn-minn/oliur/motorolia/mobil-1-esp-formula-5w-30-1l/
 https://n1.is/vorur/billinn-minn/dekk/fjorhjoladekk/10-22x8-swamp-lite-fjorhjoladekk-6pr-tl/
 https://www.walmart.com/ip/RCA-11-Galileo-Pro-with-WiFi-11.5-Touchscreen-Tablet-PC-with-Keyboard-Case-Featuring-Android-6.0-Marshmallow-Operating-System/53990867
 */
-
 
 delimiter $$
 drop procedure if exists SearchItemNumber $$
@@ -2016,4 +2082,23 @@ Call SearchOwnerAndItemNumberAndSerialNumber('N1', '3020 151456', '00000000001')
 Call SearchItemNumberAndSerialNumberAndByAndOwner('3020 151456','00000000001', 'Mobil', 'N1');
 */
 
+/*
+delimiter $$
+drop trigger if exists ReservedUserName $$
 
+create trigger ReservedUserName
+before insert on `User`
+for each row
+begin
+     declare msg varchar(255);
+     if (new.`UserName` = `UserName`) then
+            set msg = concat('the name ' + new.`UserName` + 'is allrety in use');
+            signal sqlstate '45000' set message_text = msg;
+     end if;
+end $$
+
+delimiter ;
+
+insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Credentials`,`PassWord`)values('Administrator' ,'admin','Admin@Scale2.com',5812345,1,'pass.123');
+
+*/
