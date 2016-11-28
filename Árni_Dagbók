@@ -7,3 +7,7 @@ nema í dag.
 24/11/2016
 Start up Formið er komið með Login Sem virkar.Er að vinna í LoginAuthorization() sem mun fá gildi 1-4
 og opnar missmunadi form eftir hvaða Authorization notandinn er með í SQL databaseinu.
+25/11/2016
+Bjó Til Designið meira ýttarlega og var að fikta við hönunnina.
+28/11/2016 
+Var að vinna með að fá gögn frá Select Skipunum til að geta vitað authorization á notanda
