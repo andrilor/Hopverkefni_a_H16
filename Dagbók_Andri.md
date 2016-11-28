@@ -8,4 +8,21 @@ en það sem ég gerði í dag er að læra á Github til að geta notað það 
 -Andri
 ----------------------------
 24.11.2016
-test
+
+Er Veikur í dag
+
+-Andri
+----------------------------
+25.11.2016
+
+Er Veikur í dag
+
+-Andri
+----------------------------
+28.11.2016
+
+Bjó til trigger í sql sem sér innserta inn í history töflur sem halda utan um hvað var gert í toflunum og hvenar varðandi ganag tínslu og álíka.
+
+-Andri
+----------------------------
+29.11.2016
