@@ -1903,6 +1903,17 @@ end $$
 delimiter ;
 
 delimiter $$
+drop trigger if exists InsertHistoryInsert $$
+
+create trigger InsertHistoryInsert
+before delete on Items
+for each row
+begin
+     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Item has been delete', timestamp(current_time()), timestamp(current_date()), ItemNumber, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`);
+end $$
+delimiter ;
+
+delimiter $$
 drop trigger if exists ItemPlacementHistoryInsert $$
 
 create trigger ItemPlacementHistoryInsert
@@ -1926,8 +1937,12 @@ delimiter ;
 
 insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil Super 3000 XE 5W-30 1L', '3020 151456', 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.', '00000000001', 'Mobil','N1',25);
 insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil 1 ESP Formula 5W-30 1L', '3020 437891', 'Leiðandi Smurolía sem er alveg fullkomin fyrir díselbíla. Þróuð með það í huga að bæta getu bensínbíla. Mobil 1 ESP Formula 5W-30 uppfyllir nýjustu flokkanir bílaiðnaðarins ACEA C2/C3 fyrir mótorolíur. ', '00000000002', 'Mobil','N1',15);
-insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil Super 3000 XE 5W-30 1L', '3020 151456', 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.', '00000000001', 'Mobil','Olís',25);
+insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil Super 3000 XE 5W-30 1L', '3020 151456', 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.', '00000000001', 'Mobil','N1',25);
+
 -- insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('', '', '', '', '','',);
+
+-- delete from `Items` where `Name` ='Mobil Super 3000 XE 5W-30 1L'and `ItemNumber`= '3020 151456' and `Description`= 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.'and `SerialNumber` = '00000000001'and `By` = 'Mobil'and `Owner` = 'Olís'and `amount` = 25);
+
 
 insert into `ItemPlacement` (`Amount` ,`ShelfSystem_ID`,`Items_ID`)values(5,1,1);
 insert into `ItemPlacement` (`Amount` ,`ShelfSystem_ID`,`Items_ID`)values(20,2,2);
