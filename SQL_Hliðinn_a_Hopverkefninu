@@ -9,7 +9,7 @@ create table `User`
 	`UserName` CHAR(45) NOT NULL,
 	`Email` VARCHAR(45) NOT NULL,
 	`Phone` INT NULL,
-	`Credentials` int NOT NULL,
+	`Authorizationlevel` int NOT NULL,
     `PassWord` VARCHAR(45) NOT NULL,
     constraint User_PK primary key(ID)
 );
@@ -48,8 +48,8 @@ create table `ItemPlacement`
     constraint ItemPlacement_ShelfSystem_FK foreign key(ShelfSystem_ID) references ShelfSystem(ID)
 );
 
-insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Credentials`,`PassWord`)values('Administrator' ,'admin','Admin@Scale2.com',5812345,1,'pass.123');
-insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Credentials`,`PassWord`)values('Administrator' ,'admin2','Admin@Scale9.com',5812345,1,'pass.231');
+insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Authorizationlevel`,`PassWord`)values('Administrator' ,'admin','Admin@Scale2.com',5812345,1,'pass.123');
+insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Authorizationlevel`,`PassWord`)values('Administrator' ,'admin2','Admin@Scale9.com',5812345,2,'pass.231');
 
 insert into ShelfSystem (`Section`, `Tower`, `Level`, `Row`) values('A', 01, 01, 01);
 insert into ShelfSystem (`Section`, `Tower`, `Level`, `Row`) values('A', 01, 01, 02);
@@ -1865,7 +1865,10 @@ create table ItemHistory
 	`By` CHAR(80) NOT NULL,
     `Owner` CHAR(80) NOT NULL,
     `amount` int NOT NULL,
-    constraint ItemHistory_PK primary key(ItemHistoryID)
+    /*`UserID` int not null,*/
+    
+    constraint ItemHistory_PK primary key(ItemHistoryID)/*,
+    constraint ItemHistory_User_FK foreign key(UserID) references `User`(ID)*/
 );
 
 create table ItemPlacementHistory
@@ -1877,7 +1880,10 @@ create table ItemPlacementHistory
     `Amount` INT NOT NULL,
 	`ShelfSystem_ID` INT NOT NULL,
 	`Items_ID` int(50) NOT NULL,
-    constraint ItemPlacementHistory_PK primary key(ItemPlacementHistoryID)
+	/*`UserID` int not null,*/
+ 
+    constraint ItemPlacementHistory_PK primary key(ItemPlacementHistoryID)/*,
+    constraint ItemPlacementHistory_User_FK foreign key(UserID) references `User`(ID)*/
 );
 
 delimiter $$
@@ -1887,21 +1893,21 @@ create trigger InsertHistoryInsert
 before insert on Items
 for each row
 begin
-     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('New item is now registered', timestamp(current_time()), timestamp(current_date()), new.ItemNumber, new.`Name`, new.`Description`, new.`SerialNumber`, new.`By`, new.`Owner`, new.`amount`);
+     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`/*, `UserID`*/) values('New item is now registered', timestamp(current_time()), timestamp(current_date()), new.ItemNumber, new.`Name`, new.`Description`, new.`SerialNumber`, new.`By`, new.`Owner`, new.`amount`/*, `UserID`*/);
 end $$
 delimiter ;
 
 delimiter $$
-drop trigger if exists InsertHistoryInsert $$
+drop trigger if exists InsertHistoryupdate $$
 
-create trigger InsertHistoryInsert
+create trigger InsertHistoryupdate
 before update on Items
 for each row
 begin
-     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Item information has been changed', timestamp(current_time()), timestamp(current_date()), new.ItemNumber, new.`Name`, new.`Description`, new.`SerialNumber`, new.`By`, new.`Owner`, new.`amount`);
+     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`/*, `UserID`*/) values('Item information has been changed', timestamp(current_time()), timestamp(current_date()), new.ItemNumber, new.`Name`, new.`Description`, new.`SerialNumber`, new.`By`, new.`Owner`, new.`amount`/*, `UserID`*/);
 end $$
 delimiter ;
-
+/*
 delimiter $$
 drop trigger if exists InsertHistoryInsert $$
 
@@ -1912,7 +1918,7 @@ begin
      insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Item has been delete', timestamp(current_time()), timestamp(current_date()), ItemNumber, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`);
 end $$
 delimiter ;
-
+*/
 delimiter $$
 drop trigger if exists ItemPlacementHistoryInsert $$
 
@@ -1920,18 +1926,18 @@ create trigger ItemPlacementHistoryInsert
 before insert on ItemPlacement
 for each row
 begin
-     insert into ItemPlacementHistory (TextInfo, timeOfRegistered, DateOfRegistered, `Amount` ,`ShelfSystem_ID`,`Items_ID`) values('Item placed in shelf', timestamp(current_time()), timestamp(current_date()), new.`Amount`, new.`ShelfSystem_ID`, new.`Items_ID`);
+     insert into ItemPlacementHistory (TextInfo, timeOfRegistered, DateOfRegistered, `Amount` ,`ShelfSystem_ID`,`Items_ID`/*, `UserID`*/) values('Item placed in shelf', timestamp(current_time()), timestamp(current_date()), new.`Amount`, new.`ShelfSystem_ID`, new.`Items_ID`/*, `UserID`*/);
 end $$
 delimiter ;
 
 delimiter $$
-drop trigger if exists ItemPlacementHistoryInsert $$
+drop trigger if exists ItemPlacementHistoryupdate $$
 
-create trigger ItemPlacementHistoryInsert
-before insert on ItemPlacement
+create trigger ItemPlacementHistoryupdate
+before update on ItemPlacement
 for each row
 begin
-     insert into ItemPlacementHistory (TextInfo, timeOfRegistered, DateOfRegistered, `Amount` ,`ShelfSystem_ID`,`Items_ID`) values('Item has been moved to a different shelf', timestamp(current_time()), timestamp(current_date()), new.`Amount`, new.`ShelfSystem_ID`, new.`Items_ID`);
+     insert into ItemPlacementHistory (TextInfo, timeOfRegistered, DateOfRegistered, `Amount` ,`ShelfSystem_ID`,`Items_ID`/*, `UserID`*/) values('Item has been moved to a different shelf', timestamp(current_time()), timestamp(current_date()), new.`Amount`, new.`ShelfSystem_ID`, new.`Items_ID`/*, `UserID`*/);
 end $$
 delimiter ;
 
