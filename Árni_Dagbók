@@ -10,4 +10,9 @@ og opnar missmunadi form eftir hvaða Authorization notandinn er með í SQL dat
 25/11/2016
 Bjó Til Designið meira ýttarlega og var að fikta við hönunnina.
 28/11/2016 
-Var að vinna með að fá gögn frá Select Skipunum til að geta vitað authorization á notanda
+Var að vinna með að fá gögn frá Select Skipunum til að geta vitað authorization á notanda og það hepnaðist
+Var að vinna að búa til öll önnur form fyrir missmunadi Notendur.
+29/11/2016 
+Var að reyna finna hvernig best væri að nota Grid til að sýna gögn
+á þægilegri hátt en geingur ekki svo vel.
+23/11/2016 
