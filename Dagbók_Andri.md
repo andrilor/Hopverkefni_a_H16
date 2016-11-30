@@ -26,3 +26,26 @@ Bjó til trigger í sql sem sér innserta inn í history töflur sem halda utan 
 -Andri
 ----------------------------
 29.11.2016
+
+Bjótil og var að reina að laga triggera sem teingast historty
+
+-Andri
+----------------------------
+30.11.2016
+
+hélt áfram að laga triggera sem teingast historty
+
+-Andri
+----------------------------
+01.12.2016
+
+
+
+-Andri
+----------------------------
+02.12.2016
+
+
+
+-Andri
+----------------------------
