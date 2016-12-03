@@ -18,3 +18,6 @@ Var að reyna finna hvernig best væri að nota Grid til að sýna gögn
 30/11/2016
 Bjó Til Lookið á Create a new user and update or delete er ekki búinn að gera neina virkni.
 Var að vinna í Searchitems tabinu þar komu fram 15 if setningar!!!!!. 
+31/11/2016
+Náði að láta gridview sína dummy niðurstöðu úr databaseinum og var að reyna að katla á eða =call procedure
+sem ég mundi nota til að geta set það í if setningarnar .
