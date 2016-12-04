@@ -1,3 +1,7 @@
+-----------------------------------------------------------------------------------
+Athuga Ég fékk ekkert að vita að það átti að Nota Github eða það átti að gera myndband fyrir
+en viku eftir á því ég fékk engan póst inná innu eða gmail fékk bara að vita þetta hjá hópfélaganum mínum Andri
+-----------------------------------------------------------------------------------
 23/11/2016
 Var að Læra að læra á Github og fékk
 ekki pdf skjalið sem lýsir hvernig á að skila og sambandi með myndabandið
@@ -7,17 +11,36 @@ nema í dag.
 24/11/2016
 Start up Formið er komið með Login Sem virkar.Er að vinna í LoginAuthorization() sem mun fá gildi 1-4
 og opnar missmunadi form eftir hvaða Authorization notandinn er með í SQL databaseinu.
+-----------------------------------------------------------------------------------
 25/11/2016
 Bjó Til Designið meira ýttarlega og var að fikta við hönunnina.
+-----------------------------------------------------------------------------------
 28/11/2016 
 Var að vinna með að fá gögn frá Select Skipunum til að geta vitað authorization á notanda og það hepnaðist
 Var að vinna að búa til öll önnur form fyrir missmunadi Notendur.
+-----------------------------------------------------------------------------------
 29/11/2016 
 Var að reyna finna hvernig best væri að nota Grid til að sýna gögn
 á þægilegri hátt en geingur ekki svo vel.
+-----------------------------------------------------------------------------------
 30/11/2016
 Bjó Til Lookið á Create a new user and update or delete er ekki búinn að gera neina virkni.
 Var að vinna í Searchitems tabinu þar komu fram 15 if setningar!!!!!. 
 31/11/2016
 Náði að láta gridview sína dummy niðurstöðu úr databaseinum og var að reyna að katla á eða =call procedure
 sem ég mundi nota til að geta set það í if setningarnar .
+-----------------------------------------------------------------------------------
+01/12/2016
+Working on SearchItems and placing each specific Procedures into the if settings
+and load the mto the data grid view
+
+-----------------------------------------------------------------------------------
+02/12/2016
+Finished on SearchItems and placing each specific Procedures into the if settings
+and load the mto the data grid view
+-----------------------------------------------------------------------------------
+03/12/2016
+Finished Create User Tab.Created some rules to check before i the program is allowed to inser into the user table.
+-----------------------------------------------------------------------------------
+04/12/2016
+Finished the Update,Delete Users in the Create User Tab.and also list the users in a grid 
