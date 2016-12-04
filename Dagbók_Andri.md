@@ -39,11 +39,23 @@ hélt áfram að laga triggera sem teingast historty
 ----------------------------
 01.12.2016
 
-
+hélt áfram að laga triggera sem teingast historty og ItemPlacementHistorySearchtriggers
 
 -Andri
 ----------------------------
 02.12.2016
+
+kláraði ItemPlacementHistorySearchtriggers 1-31 og byrjaði á ItemHistorySearchtriggers
+
+-Andri
+----------------------------
+03.12.2016
+
+
+
+-Andri
+----------------------------
+04.12.2016
 
 
 
