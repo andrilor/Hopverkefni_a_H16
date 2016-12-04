@@ -51,13 +51,13 @@ kláraði ItemPlacementHistorySearchtriggers 1-31 og byrjaði á ItemHistorySear
 ----------------------------
 03.12.2016
 
-
+Byrjaði á ItemHistorySearchtriggers og komst langleiðina með það
 
 -Andri
 ----------------------------
 04.12.2016
 
-
+kláraði ItemHistorySearchtriggers og skilaði inn verkefninu með öllum gögnum
 
 -Andri
 ----------------------------
