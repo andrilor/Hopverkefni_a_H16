@@ -1865,10 +1865,8 @@ create table ItemHistory
 	`By` CHAR(80) NOT NULL,
     `Owner` CHAR(80) NOT NULL,
     `amount` int NOT NULL,
-    /*`UserID` int not null,*/
-    
-    constraint ItemHistory_PK primary key(ItemHistoryID)/*,
-    constraint ItemHistory_User_FK foreign key(UserID) references `User`(ID)*/
+    `UserID` int,
+    constraint ItemHistory_PK primary key(ItemHistoryID)
 );
 
 create table ItemPlacementHistory
@@ -1880,10 +1878,8 @@ create table ItemPlacementHistory
     `Amount` INT NOT NULL,
 	`ShelfSystem_ID` INT NOT NULL,
 	`Items_ID` int(50) NOT NULL,
-	/*`UserID` int not null,*/
- 
-    constraint ItemPlacementHistory_PK primary key(ItemPlacementHistoryID)/*,
-    constraint ItemPlacementHistory_User_FK foreign key(UserID) references `User`(ID)*/
+	`UserID` int,
+    constraint ItemPlacementHistory_PK primary key(ItemPlacementHistoryID)
 );
 
 delimiter $$
@@ -1909,13 +1905,13 @@ end $$
 delimiter ;
 /*
 delimiter $$
-drop trigger if exists InsertHistoryInsert $$
+drop trigger if exists InsertHistorydelete $$
 
-create trigger InsertHistoryInsert
+create trigger InsertHistorydelete
 before delete on Items
 for each row
 begin
-     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Item has been delete', timestamp(current_time()), timestamp(current_date()), ItemNumber, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`);
+     insert into ItemHistory (TextInfo, timeOfRegistered, DateOfRegistered, `ItemNumber`, `Name`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`/*, `UserID`) values('Item has been delete', timestamp(current_time()), timestamp(current_date()), new.ItemNumber, new.`Name`, new.`Description`, new.`SerialNumber`, new.`By`, new.`Owner`, new.`amount`/*, `UserID`);
 end $$
 delimiter ;
 */
@@ -1940,15 +1936,39 @@ begin
      insert into ItemPlacementHistory (TextInfo, timeOfRegistered, DateOfRegistered, `Amount` ,`ShelfSystem_ID`,`Items_ID`/*, `UserID`*/) values('Item has been moved to a different shelf', timestamp(current_time()), timestamp(current_date()), new.`Amount`, new.`ShelfSystem_ID`, new.`Items_ID`/*, `UserID`*/);
 end $$
 delimiter ;
+/*
+delimiter $$
+drop trigger if exists ItemPlacementHistorydelete $$
+
+create trigger ItemPlacementHistorydelete
+before delete on ItemPlacement
+for each row
+begin
+     insert into ItemPlacementHistory (TextInfo, timeOfRegistered, DateOfRegistered, `Amount` ,`ShelfSystem_ID`,`Items_ID`/*, `UserID`) values('Item has been removed from shelf', timestamp(current_time()), timestamp(current_date()), new.`Amount`, new.`ShelfSystem_ID`, new.`Items_ID`/*, `UserID`);
+end $$
+delimiter ;
+*/
+
+/*
+delimiter $$
+drop trigger if exists SumItems $$
+
+create trigger SumItems
+after insert on Items
+for each row 
+begin
+     UPDATE items SET `amount`= `amount` + new.amount WHERE `Name` = new.`Name` and `ItemNumber` = new.`ItemNumber` and `Description` = new.`Description` and `SerialNumber` = new.`SerialNumber` and `By` = new.`By` and `Owner` = new.`Owner`;
+     DELETE FROM items WHERE `Name` = new.`Name` and `ItemNumber` = new.`ItemNumber` and `Description` = new.`Description` and `SerialNumber` = new.`SerialNumber` and `By` = new.`By` and `Owner` = new.`Owner`;
+end $$
+delimiter ;
+
+*/
 
 insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil Super 3000 XE 5W-30 1L', '3020 151456', 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.', '00000000001', 'Mobil','N1',25);
 insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil 1 ESP Formula 5W-30 1L', '3020 437891', 'Leiðandi Smurolía sem er alveg fullkomin fyrir díselbíla. Þróuð með það í huga að bæta getu bensínbíla. Mobil 1 ESP Formula 5W-30 uppfyllir nýjustu flokkanir bílaiðnaðarins ACEA C2/C3 fyrir mótorolíur. ', '00000000002', 'Mobil','N1',15);
-insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil Super 3000 XE 5W-30 1L', '3020 151456', 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.', '00000000001', 'Mobil','N1',25);
-
+insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('Mobil Super 3000 XE 5W-30 1L', '3020 151457', 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.', '00000000001', 'Mobil','olis',25);
 -- insert into `Items` (`Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount`) values('', '', '', '', '','',);
-
--- delete from `Items` where `Name` ='Mobil Super 3000 XE 5W-30 1L'and `ItemNumber`= '3020 151456' and `Description`= 'Syntetísk olía ætluð fyrir bensín- og díselbíla frá GM, BMW og MB, Hentar einnig á aðrar gerðir þar sem gerð er krafa um ACEA C3 flokkun.'and `SerialNumber` = '00000000001'and `By` = 'Mobil'and `Owner` = 'Olís'and `amount` = 25);
-
+UPDATE Items SET ItemNumber='3020 151457W' WHERE ItemNumber='3020 151457';
 
 insert into `ItemPlacement` (`Amount` ,`ShelfSystem_ID`,`Items_ID`)values(5,1,1);
 insert into `ItemPlacement` (`Amount` ,`ShelfSystem_ID`,`Items_ID`)values(20,2,2);
@@ -1956,170 +1976,494 @@ insert into `ItemPlacement` (`Amount` ,`ShelfSystem_ID`,`Items_ID`)values(10,3,2
 insert into `ItemPlacement` (`Amount` ,`ShelfSystem_ID`,`Items_ID`)values(5,3,3);
 -- insert into `ItemPlacement` (`Amount` ,`ShelfSystem_ID`,`Items_ItemNumber`)values(,,'');
 
--- select * From Items;
--- select * From ItemPlacement where ShelfSystem_ID = 3;
-
-/*
-https://n1.is/vorur/billinn-minn/oliur/motorolia/mobil-1-esp-formula-5w-30-1l/
-https://n1.is/vorur/billinn-minn/dekk/fjorhjoladekk/10-22x8-swamp-lite-fjorhjoladekk-6pr-tl/
-https://www.walmart.com/ip/RCA-11-Galileo-Pro-with-WiFi-11.5-Touchscreen-Tablet-PC-with-Keyboard-Case-Featuring-Android-6.0-Marshmallow-Operating-System/53990867
-*/
-
 delimiter $$
-drop procedure if exists SearchItemNumber $$
-create procedure SearchItemNumber(Item_Number char(50))
+drop procedure if exists ItemsSearchItemNumber $$
+create procedure ItemsSearchItemNumber(Item_Number char(50))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE ItemNumber = Item_Number;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchSerialNumber $$
-create procedure SearchSerialNumber(Serial_Number char(11))
+drop procedure if exists ItemsSearchSerialNumber $$
+create procedure ItemsSearchSerialNumber(Serial_Number char(11))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE SerialNumber = Serial_Number;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchBy $$
-create procedure SearchBy(`S_By` char(80))
+drop procedure if exists ItemsSearchBy $$
+create procedure ItemsSearchBy(`S_By` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE `By` = `S_By`;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchOwner $$
-create procedure SearchOwner(`S_Owner` char(80))
+drop procedure if exists ItemsSearchOwner $$
+create procedure ItemsSearchOwner(`S_Owner` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE `Owner` = S_Owner;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchItemNumberAndSerialNumber $$
-create procedure SearchItemNumberAndSerialNumber(Item_Number char(50), Serial_Number char(11))
+drop procedure if exists ItemsSearchItemNumberAndSerialNumber $$
+create procedure ItemsSearchItemNumberAndSerialNumber(Item_Number char(50), Serial_Number char(11))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE ItemNumber = Item_Number and SerialNumber = Serial_Number;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchSerialNumberAndBy $$
-create procedure SearchSerialNumberAndBy(Serial_Number char(11), `S_By` char(80))
+drop procedure if exists ItemsSearchSerialNumberAndBy $$
+create procedure ItemsSearchSerialNumberAndBy(Serial_Number char(11), `S_By` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE SerialNumber = Serial_Number and `By` = `S_By`;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchByAndOwner $$
-create procedure SearchByAndOwner(`S_By` char(80), `S_Owner` char(80))
+drop procedure if exists ItemsSearchByAndOwner $$
+create procedure ItemsSearchByAndOwner(`S_By` char(80), `S_Owner` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE `By` = `S_By` And `Owner` = S_Owner;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchItemNumberAndBy $$
-create procedure SearchItemNumberAndBy(Item_Number char(50), `S_By` char(80))
+drop procedure if exists ItemsSearchItemNumberAndBy $$
+create procedure ItemsSearchItemNumberAndBy(Item_Number char(50), `S_By` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE ItemNumber = Item_Number And `By` = `S_By`;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchItemNumberAndOwner $$
-create procedure SearchItemNumberAndOwner(Item_Number char(50), `S_Owner` char(80))
+drop procedure if exists ItemsSearchItemNumberAndOwner $$
+create procedure ItemsSearchItemNumberAndOwner(Item_Number char(50), `S_Owner` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE ItemNumber = Item_Number And `Owner` = S_Owner;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchSerialNumberAndOwner $$
-create procedure SearchSerialNumberAndOwner(Serial_Number char(11), `S_Owner` char(80))
+drop procedure if exists ItemsSearchSerialNumberAndOwner $$
+create procedure ItemsSearchSerialNumberAndOwner(Serial_Number char(11), `S_Owner` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE SerialNumber = Serial_Number And `Owner` = S_Owner;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchItemNumberAndSerialNumberAndBy $$
-create procedure SearchItemNumberAndSerialNumberAndBy(Item_Number char(50), Serial_Number char(11), `S_By` char(80))
+drop procedure if exists ItemsSearchItemNumberAndSerialNumberAndBy $$
+create procedure ItemsSearchItemNumberAndSerialNumberAndBy(Item_Number char(50), Serial_Number char(11), `S_By` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE ItemNumber = Item_Number and SerialNumber = Serial_Number And `By` = `S_By`;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchSerialNumberAndByAndOwner $$
-create procedure SearchSerialNumberAndByAndOwner(Serial_Number char(11), `S_By` char(80), `S_Owner` char(80))
+drop procedure if exists ItemsSearchSerialNumberAndByAndOwner $$
+create procedure ItemsSearchSerialNumberAndByAndOwner(Serial_Number char(11), `S_By` char(80), `S_Owner` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE SerialNumber = Serial_Number and `By` = `S_By` And `Owner` = S_Owner;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchByAndOwnerAndItemNumber $$
-create procedure SearchByAndOwnerAndItemNumber(`S_By` char(80), `S_Owner` char(80), Item_Number char(50))
+drop procedure if exists ItemsSearchByAndOwnerAndItemNumber $$
+create procedure ItemsSearchByAndOwnerAndItemNumber(`S_By` char(80), `S_Owner` char(80), Item_Number char(50))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE `By` = `S_By` And `Owner` = S_Owner and ItemNumber = Item_Number;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchOwnerAndItemNumberAndSerialNumber $$
-create procedure SearchOwnerAndItemNumberAndSerialNumber(`S_Owner` char(80),Item_Number char(50), Serial_Number char(11))
+drop procedure if exists ItemsSearchOwnerAndItemNumberAndSerialNumber $$
+create procedure ItemsSearchOwnerAndItemNumberAndSerialNumber(`S_Owner` char(80),Item_Number char(50), Serial_Number char(11))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM  Items WHERE `Owner` = S_Owner and ItemNumber = Item_Number and SerialNumber = Serial_Number;
 end $$
 delimiter ;
 
 delimiter $$
-drop procedure if exists SearchItemNumberAndSerialNumberAndByAndOwner $$
-create procedure SearchItemNumberAndSerialNumberAndByAndOwner(Item_Number char(50), Serial_Number char(11), `S_By` char(80), `S_Owner` char(80))
+drop procedure if exists ItemsSearchItemNumberAndSerialNumberAndByAndOwner $$
+create procedure ItemsSearchItemNumberAndSerialNumberAndByAndOwner(Item_Number char(50), Serial_Number char(11), `S_By` char(80), `S_Owner` char(80))
 begin
 	Select `Name`, `ItemNumber`, `Description`, `SerialNumber`, `By`, `Owner`, `amount` FROM Items WHERE ItemNumber = Item_Number and SerialNumber = Serial_Number And `By` = `S_By` And `Owner` = S_Owner;
 end $$
 delimiter ;
 
 /*
-call SearchItemNumber('3020 151456');
-call SearchSerialNumber('00000000001');
-call SearchBy('Mobil');
-call SearchOwner('N1');
-Call SearchItemNumberAndSerialNumber('3020 151456','00000000001');
-Call SearchSerialNumberAndBy('00000000001','Mobil');
-Call SearchByAndOwner('Mobil','N1');
-Call SearchItemNumberAndBy('3020 151456', 'Mobil');
-Call SearchItemNumberAndOwner('3020 151456', 'N1');
-Call SearchSerialNumberAndOwner('00000000001', 'N1');
-Call SearchItemNumberAndSerialNumberAndBy('3020 151456','00000000001', 'Mobil');
-Call SearchSerialNumberAndByAndOwner('00000000001', 'Mobil', 'N1');
-Call SearchByAndOwnerAndItemNumber('Mobil', 'N1', '3020 151456');
-Call SearchOwnerAndItemNumberAndSerialNumber('N1', '3020 151456', '00000000001');
-Call SearchItemNumberAndSerialNumberAndByAndOwner('3020 151456','00000000001', 'Mobil', 'N1');
+call ItemsSearchItemNumber('3020 151456');
+call ItemsSearchSerialNumber('00000000001');
+call ItemsSearchBy('mobil');
+call ItemsSearchOwner('N1');
+Call ItemsSearchItemNumberAndSerialNumber('3020 151456','00000000001');
+Call ItemsSearchSerialNumberAndBy('00000000001','Mobil');
+Call ItemsSearchByAndOwner('Mobil','N1');
+Call ItemsSearchItemNumberAndBy('3020 151456', 'Mobil');
+Call ItemsSearchItemNumberAndOwner('3020 151456', 'N1');
+Call ItemsSearchSerialNumberAndOwner('00000000001', 'N1');
+Call ItemsSearchItemNumberAndSerialNumberAndBy('3020 151456','00000000001', 'Mobil');
+Call ItemsSearchSerialNumberAndByAndOwner('00000000001', 'Mobil', 'N1');
+Call ItemsSearchByAndOwnerAndItemNumber('Mobil', 'N1', '3020 151456');
+Call ItemsSearchOwnerAndItemNumberAndSerialNumber('N1', '3020 151456', '00000000001');
+Call ItemsSearchItemNumberAndSerialNumberAndByAndOwner('3020 151456','00000000001', 'Mobil', 'N1');
 */
 
-/*
 delimiter $$
-drop trigger if exists ReservedUserName $$
-
-create trigger ReservedUserName
-before insert on `User`
-for each row
+drop procedure if exists ItemPlacementHistorySearchtriggers1 $$
+create procedure ItemPlacementHistorySearchtriggers1(Text_Info Varchar(100), Date_Of_Registered date, `s_Amount` INT, `ShelfSystem_ID` INT, `Items_ID` int(50),`UserID` int)
 begin
-     declare msg varchar(255);
-     if (new.`UserName` = `UserName`) then
-            set msg = concat('the name ' + new.`UserName` + 'is allrety in use');
-            signal sqlstate '45000' set message_text = msg;
-     end if;
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
 end $$
-
 delimiter ;
 
-insert into `User` (`FullName` ,`UserName`,`Email`,`Phone`,`Credentials`,`PassWord`)values('Administrator' ,'admin','Admin@Scale2.com',5812345,1,'pass.123');
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers2 $$
+create procedure ItemPlacementHistorySearchtriggers2(Text_Info Varchar(100), Date_Of_Registered date, `s_Amount` INT, `ShelfSystem_ID` INT, `Items_ID` int(50))
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID`;
+end $$
+delimiter ;
 
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers3 $$
+create procedure ItemPlacementHistorySearchtriggers3(Date_Of_Registered date, `s_Amount` INT, `ShelfSystem_ID` INT, `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers4 $$
+create procedure ItemPlacementHistorySearchtriggers4(Text_Info Varchar(100), `s_Amount` INT, `ShelfSystem_ID` INT, `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers5 $$
+create procedure ItemPlacementHistorySearchtriggers5(Text_Info Varchar(100), Date_Of_Registered date, `ShelfSystem_ID` INT, `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers6 $$
+create procedure ItemPlacementHistorySearchtriggers6(Text_Info Varchar(100), Date_Of_Registered date, `s_Amount` INT, `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers7 $$
+create procedure ItemPlacementHistorySearchtriggers7(Text_Info Varchar(100), Date_Of_Registered date, `s_Amount` INT, `ShelfSystem_ID` INT,`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers8 $$
+create procedure ItemPlacementHistorySearchtriggers8(Text_Info Varchar(100), Date_Of_Registered date, `s_Amount` INT, `ShelfSystem_ID` INT)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers9 $$
+create procedure ItemPlacementHistorySearchtriggers9(Date_Of_Registered date, `s_Amount` INT, `ShelfSystem_ID` INT, `Items_ID` int(50))
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers10 $$
+create procedure ItemPlacementHistorySearchtriggers10(`s_Amount` INT, `ShelfSystem_ID` INT, `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers11 $$
+create procedure ItemPlacementHistorySearchtriggers11(Text_Info Varchar(100), `ShelfSystem_ID` INT, `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers12 $$
+create procedure ItemPlacementHistorySearchtriggers12(Text_Info Varchar(100), Date_Of_Registered date, `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers13 $$
+create procedure ItemPlacementHistorySearchtriggers13(Text_Info Varchar(100), Date_Of_Registered date, `s_Amount` INT, `UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers14 $$
+create procedure ItemPlacementHistorySearchtriggers14(Text_Info Varchar(100), Date_Of_Registered date, `s_Amount` INT)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers15 $$
+create procedure ItemPlacementHistorySearchtriggers15(Date_Of_Registered date, `s_Amount` INT, `ShelfSystem_ID` INT)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers16 $$
+create procedure ItemPlacementHistorySearchtriggers16(`s_Amount` INT, `ShelfSystem_ID` INT, `Items_ID` int(50))
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers17 $$
+create procedure ItemPlacementHistorySearchtriggers17(`ShelfSystem_ID` INT, `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers18 $$
+create procedure ItemPlacementHistorySearchtriggers18(Text_Info Varchar(100), `Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers19 $$
+create procedure ItemPlacementHistorySearchtriggers19(Text_Info Varchar(100), Date_Of_Registered date,`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers20 $$
+create procedure ItemPlacementHistorySearchtriggers20(Text_Info Varchar(100), Date_Of_Registered date)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `TextInfo` = Text_Info and `DateOfRegistered` = Date_Of_Registered;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers21 $$
+create procedure ItemPlacementHistorySearchtriggers21(Date_Of_Registered date, `s_Amount` INT)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `DateOfRegistered` = Date_Of_Registered and `Amount` = `s_Amount`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers22 $$
+create procedure ItemPlacementHistorySearchtriggers22(`s_Amount` INT, `ShelfSystem_ID` INT)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `Amount` = `s_Amount` and `ShelfSystem_ID` = `ShelfSystem_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers23 $$
+create procedure ItemPlacementHistorySearchtriggers23(`ShelfSystem_ID` INT, `Items_ID` int(50))
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `ShelfSystem_ID` = `ShelfSystem_ID` and `Items_ID` = `Items_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers24 $$
+create procedure ItemPlacementHistorySearchtriggers24(`Items_ID` int(50),`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `Items_ID` = `Items_ID` and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers25 $$
+create procedure ItemPlacementHistorySearchtriggers25(Text_Info Varchar(100), `UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE`TextInfo` = Text_Info and `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers26 $$
+create procedure ItemPlacementHistorySearchtriggers26(Text_Info Varchar(100))
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `TextInfo` = Text_Info;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers27 $$
+create procedure ItemPlacementHistorySearchtriggers27(Date_Of_Registered date)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `DateOfRegistered` = Date_Of_Registered;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers28 $$
+create procedure ItemPlacementHistorySearchtriggers28(`s_Amount` INT)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `Amount` = `s_Amount`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers29 $$
+create procedure ItemPlacementHistorySearchtriggers29(`ShelfSystem_ID` INT)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `ShelfSystem_ID` = `ShelfSystem_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers30 $$
+create procedure ItemPlacementHistorySearchtriggers30(`Items_ID` int(50))
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `Items_ID` = `Items_ID`;
+end $$
+delimiter ;
+
+delimiter $$
+drop procedure if exists ItemPlacementHistorySearchtriggers31 $$
+create procedure ItemPlacementHistorySearchtriggers31(`UserID` int)
+begin
+	Select `TextInfo`, `timeOfRegistered`, `DateOfRegistered`, `Amount`, `ShelfSystem_ID`, `Items_ID`, `UserID` 
+    FROM ItemPlacementHistory 
+    WHERE `UserID` = `User_ID`;
+end $$
+delimiter ;
+
+/*
+-- call ItemPlacementHistorySearchtriggers1('Item placed in shelf','2016-12-03',5,1,1,'');
+call ItemPlacementHistorySearchtriggers2('Item placed in shelf','2016-12-03',5,1,1);
+-- call ItemPlacementHistorySearchtriggers3('2016-12-03',5,1,1,'');
+-- call ItemPlacementHistorySearchtriggers4('Item placed in shelf',5,1,1,'');
+-- call ItemPlacementHistorySearchtriggers5('Item placed in shelf','2016-12-03',1,1,'');
+-- call ItemPlacementHistorySearchtriggers6('Item placed in shelf','2016-12-03',5,1,'');
+-- call ItemPlacementHistorySearchtriggers7('Item placed in shelf','2016-12-03',5,1,'');
+call ItemPlacementHistorySearchtriggers8('Item placed in shelf','2016-12-03',5,1);
+call ItemPlacementHistorySearchtriggers9('2016-12-03',5,1,1);
+-- call ItemPlacementHistorySearchtriggers10(5,1,1,'');
+-- call ItemPlacementHistorySearchtriggers11('Item placed in shelf',1,1,'');
+-- call ItemPlacementHistorySearchtriggers12('Item placed in shelf','2016-12-03',1,'');
+-- call ItemPlacementHistorySearchtriggers13('Item placed in shelf','2016-12-03',5,'');
+call ItemPlacementHistorySearchtriggers14('Item placed in shelf','2016-12-03',5);
+call ItemPlacementHistorySearchtriggers15('2016-12-03',5,1);
+call ItemPlacementHistorySearchtriggers16(5,1,1);
+-- call ItemPlacementHistorySearchtriggers17(1,1,'');
+-- call ItemPlacementHistorySearchtriggers18('Item placed in shelf',1,'');
+-- call ItemPlacementHistorySearchtriggers19('Item placed in shelf','2016-12-03','');
+call ItemPlacementHistorySearchtriggers20('Item placed in shelf','2016-12-03');
+call ItemPlacementHistorySearchtriggers21('2016-12-03',5);
+call ItemPlacementHistorySearchtriggers22(5,1);
+call ItemPlacementHistorySearchtriggers23(1,1);
+-- call ItemPlacementHistorySearchtriggers24(1,'');
+-- call ItemPlacementHistorySearchtriggers25('Item placed in shelf','');
+call ItemPlacementHistorySearchtriggers26('Item placed in shelf');
+call ItemPlacementHistorySearchtriggers27('2016-12-03');
+call ItemPlacementHistorySearchtriggers28(5);
+call ItemPlacementHistorySearchtriggers29(1);
+call ItemPlacementHistorySearchtriggers30(1);
+-- call ItemPlacementHistorySearchtriggers31('');
 */
+-- select * from ItemHistory;
+
+
+
+
+
+
+
+
+
