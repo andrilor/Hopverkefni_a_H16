@@ -1,5 +1,4 @@
 # Hopverkefni_a_H16
-Hópverkefni_á_H16
 
 ---SQL---
 
